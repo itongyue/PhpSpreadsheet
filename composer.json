@@ -17,6 +17,7 @@
     "homepage": "https://github.com/PHPOffice/PhpSpreadsheet",
     "type": "library",
     "license": "MIT",
+    "version": "1.18.1",
     "authors": [
         {
             "name": "Maarten Balliauw",

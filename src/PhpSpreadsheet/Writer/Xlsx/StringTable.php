@@ -35,7 +35,7 @@ class StringTable extends WriterPart
         $aFlippedStringTable = $this->flipStringTable($aStringTable);
 
         // Loop through cells
-        foreach ($pSheet->getCoordinates() as $coordinate) {
+        foreach ($pSheet->getCoordinates(false) as $coordinate) {
             $cell = $pSheet->getCell($coordinate);
             $cellValue = $cell->getValue();
             if (

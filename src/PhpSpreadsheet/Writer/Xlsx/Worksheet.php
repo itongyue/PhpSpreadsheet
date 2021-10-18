@@ -1132,7 +1132,7 @@ class Worksheet extends WriterPart
 
         // Loop through cells
         $cellsByRow = [];
-        foreach ($pSheet->getCoordinates() as $coordinate) {
+        foreach ($pSheet->getCoordinates(false) as $coordinate) {
             $cellAddress = Coordinate::coordinateFromString($coordinate);
             $cellsByRow[$cellAddress[1]][] = $coordinate;
         }
