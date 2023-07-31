@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class TextJoinTest extends AllSetupTeardown
 {
     /**
@@ -28,8 +30,29 @@ class TextJoinTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerTEXTJOIN(): array
+    public static function providerTEXTJOIN(): array
     {
         return require 'tests/data/Calculation/TextData/TEXTJOIN.php';
+    }
+
+    /**
+     * @dataProvider providerTextjoinArray
+     */
+    public function testTextjoinArray(array $expectedResult, string $delimiter, string $blanks, string $texts): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=TEXTJOIN({$delimiter}, {$blanks}, {$texts})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerTextjoinArray(): array
+    {
+        return [
+            'row vector #1' => [[['AB,CD,EF', 'AB;CD;EF']], '{",", ";"}', 'FALSE', '"AB", "CD", "EF"'],
+            'column vector #1' => [[['AB--CD--EF'], ['AB|CD|EF']], '{"--"; "|"}', 'FALSE', '"AB", "CD", "EF"'],
+            'matrix #1' => [[['AB,CD,EF', 'AB;CD;EF'], ['AB-CD-EF', 'AB|CD|EF']], '{",", ";"; "-", "|"}', 'FALSE', '"AB", "CD", "EF"'],
+        ];
     }
 }

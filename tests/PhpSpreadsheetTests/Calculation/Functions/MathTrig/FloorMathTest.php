@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class FloorMathTest extends AllSetupTeardown
 {
     /**
@@ -23,8 +25,27 @@ class FloorMathTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerFLOORMATH(): array
+    public static function providerFLOORMATH(): array
     {
         return require 'tests/data/Calculation/MathTrig/FLOORMATH.php';
+    }
+
+    /**
+     * @dataProvider providerFloorArray
+     */
+    public function testFloorArray(array $expectedResult, string $argument1, string $argument2): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=FLOOR.MATH({$argument1}, {$argument2})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerFloorArray(): array
+    {
+        return [
+            'matrix' => [[[3.14, 3.14], [3.14155, 3.141592]], '3.1415926536', '{0.01, 0.002; 0.00005, 0.000002}'],
+        ];
     }
 }

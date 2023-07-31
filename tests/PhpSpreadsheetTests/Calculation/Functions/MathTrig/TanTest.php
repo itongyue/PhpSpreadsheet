@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class TanTest extends AllSetupTeardown
 {
     /**
@@ -19,8 +21,29 @@ class TanTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-6);
     }
 
-    public function providerTan(): array
+    public static function providerTan(): array
     {
         return require 'tests/data/Calculation/MathTrig/TAN.php';
+    }
+
+    /**
+     * @dataProvider providerTanArray
+     */
+    public function testTanArray(array $expectedResult, string $array): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=TAN({$array})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerTanArray(): array
+    {
+        return [
+            'row vector' => [[[1.55740772465490, 0.54630248984379, -1.55740772465490]], '{1, 0.5, -1}'],
+            'column vector' => [[[1.55740772465490], [0.54630248984379], [-1.55740772465490]], '{1; 0.5; -1}'],
+            'matrix' => [[[1.55740772465490, 0.54630248984379], [0.0, -1.55740772465490]], '{1, 0.5; 0, -1}'],
+        ];
     }
 }

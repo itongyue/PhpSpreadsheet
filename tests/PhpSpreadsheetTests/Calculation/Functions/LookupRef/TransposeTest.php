@@ -21,11 +21,11 @@ class TransposeTest extends TestCase
      */
     public function testTRANSPOSE($expectedResult, $matrix): void
     {
-        $result = LookupRef::TRANSPOSE($matrix);
+        $result = LookupRef\Matrix::transpose($matrix);
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerTRANSPOSE(): array
+    public static function providerTRANSPOSE(): array
     {
         return require 'tests/data/Calculation/LookupRef/TRANSPOSE.php';
     }

@@ -23,7 +23,7 @@ class DimensionTest extends TestCase
     public function testConvertDimension(float $expectedResult, string $dimension, string $unitOfMeasure): void
     {
         $result = (new Dimension($dimension))->toUnit($unitOfMeasure);
-        self::assertSame($expectedResult, $result);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-12);
     }
 
     public function testConvertDimensionInvalidUoM(): void
@@ -33,7 +33,7 @@ class DimensionTest extends TestCase
         (new Dimension('999'))->toUnit('pikachu');
     }
 
-    public function providerCellWidth(): array
+    public static function providerCellWidth(): array
     {
         return [
             [12.0, '12'],
@@ -52,7 +52,7 @@ class DimensionTest extends TestCase
         ];
     }
 
-    public function providerConvertUoM(): array
+    public static function providerConvertUoM(): array
     {
         return [
             [60, '8.54', Dimension::UOM_PIXELS],

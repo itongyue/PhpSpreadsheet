@@ -2,6 +2,7 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Settings;
 
@@ -32,7 +33,7 @@ class RightTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerRIGHT(): array
+    public static function providerRIGHT(): array
     {
         return require 'tests/data/Calculation/TextData/RIGHT.php';
     }
@@ -60,7 +61,7 @@ class RightTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerLocaleRIGHT(): array
+    public static function providerLocaleRIGHT(): array
     {
         return [
             ['RAI', 'fr_FR', true, 3],
@@ -89,7 +90,7 @@ class RightTest extends AllSetupTeardown
         self::assertEquals($resultB2, $sheet->getCell('B2')->getCalculatedValue());
     }
 
-    public function providerCalculationTypeRIGHTTrue(): array
+    public static function providerCalculationTypeRIGHTTrue(): array
     {
         return [
             'Excel RIGHT(true, 1) AND RIGHT("hello", true)' => [
@@ -125,7 +126,7 @@ class RightTest extends AllSetupTeardown
         self::assertEquals($resultB2, $sheet->getCell('B2')->getCalculatedValue());
     }
 
-    public function providerCalculationTypeRIGHTFalse(): array
+    public static function providerCalculationTypeRIGHTFalse(): array
     {
         return [
             'Excel RIGHT(false, 1) AND RIGHT("hello", false)' => [
@@ -160,7 +161,7 @@ class RightTest extends AllSetupTeardown
         self::assertEquals($resultB2, $sheet->getCell('B2')->getCalculatedValue());
     }
 
-    public function providerCalculationTypeRIGHTNull(): array
+    public static function providerCalculationTypeRIGHTNull(): array
     {
         return [
             'Excel RIGHT(null, 1) AND RIGHT("hello", null)' => [
@@ -178,6 +179,28 @@ class RightTest extends AllSetupTeardown
                 '',
                 '',
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerRightArray
+     */
+    public function testRightArray(array $expectedResult, string $argument1, string $argument2): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=RIGHT({$argument1}, {$argument2})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerRightArray(): array
+    {
+        return [
+            'row vector #1' => [[['llo', 'rld', 'eet']], '{"Hello", "World", "PhpSpreadsheet"}', '3'],
+            'column vector #1' => [[['llo'], ['rld'], ['eet']], '{"Hello"; "World"; "PhpSpreadsheet"}', '3'],
+            'matrix #1' => [[['llo', 'rld'], ['eet', 'cel']], '{"Hello", "World"; "PhpSpreadsheet", "Excel"}', '3'],
+            'column vector #2' => [[['eet'], ['sheet']], '"PhpSpreadsheet"', '{3; 5}'],
         ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class CothTest extends AllSetupTeardown
 {
     /**
@@ -23,8 +25,29 @@ class CothTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-9);
     }
 
-    public function providerCOTH(): array
+    public static function providerCOTH(): array
     {
         return require 'tests/data/Calculation/MathTrig/COTH.php';
+    }
+
+    /**
+     * @dataProvider providerCothArray
+     */
+    public function testCothArray(array $expectedResult, string $array): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=COTH({$array})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerCothArray(): array
+    {
+        return [
+            'row vector' => [[[1.31303528549933, 2.16395341373865, -1.31303528549933]], '{1, 0.5, -1}'],
+            'column vector' => [[[1.31303528549933], [2.16395341373865], [-1.31303528549933]], '{1; 0.5; -1}'],
+            'matrix' => [[[1.31303528549933, 2.16395341373865], ['#DIV/0!', -1.31303528549933]], '{1, 0.5; 0, -1}'],
+        ];
     }
 }

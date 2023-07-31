@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class SechTest extends AllSetupTeardown
 {
     /**
@@ -23,8 +25,29 @@ class SechTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-9);
     }
 
-    public function providerSECH(): array
+    public static function providerSECH(): array
     {
         return require 'tests/data/Calculation/MathTrig/SECH.php';
+    }
+
+    /**
+     * @dataProvider providerSechArray
+     */
+    public function testSechArray(array $expectedResult, string $array): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=SECH({$array})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerSechArray(): array
+    {
+        return [
+            'row vector' => [[[0.64805427366389, 0.88681888397007, 0.64805427366389]], '{1, 0.5, -1}'],
+            'column vector' => [[[0.64805427366389], [0.88681888397007], [0.64805427366389]], '{1; 0.5; -1}'],
+            'matrix' => [[[0.64805427366389, 0.88681888397007], [1.0, 0.64805427366389]], '{1, 0.5; 0, -1}'],
+        ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class ExpTest extends AllSetupTeardown
 {
     /**
@@ -26,8 +28,29 @@ class ExpTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerEXP(): array
+    public static function providerEXP(): array
     {
         return require 'tests/data/Calculation/MathTrig/EXP.php';
+    }
+
+    /**
+     * @dataProvider providerExpArray
+     */
+    public function testExpArray(array $expectedResult, string $array): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=EXP({$array})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerExpArray(): array
+    {
+        return [
+            'row vector' => [[[1.0, 2.718281828459045, 12.182493960703473]], '{0, 1, 2.5}'],
+            'column vector' => [[[1.0], [2.718281828459045], [12.182493960703473]], '{0; 1; 2.5}'],
+            'matrix' => [[[1.0, 2.718281828459045], [12.182493960703473, 0.0820849986239]], '{0, 1; 2.5, -2.5}'],
+        ];
     }
 }

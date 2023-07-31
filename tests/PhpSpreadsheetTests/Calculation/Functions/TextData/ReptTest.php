@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class ReptTest extends AllSetupTeardown
 {
     /**
@@ -29,8 +31,30 @@ class ReptTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerREPT(): array
+    public static function providerREPT(): array
     {
         return require 'tests/data/Calculation/TextData/REPT.php';
+    }
+
+    /**
+     * @dataProvider providerReptArray
+     */
+    public function testReptArray(array $expectedResult, string $argument1, string $argument2): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=REPT({$argument1}, {$argument2})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerReptArray(): array
+    {
+        return [
+            'row vector #1' => [[['PHPPHPPHP', 'HAHAHA', 'HOHOHO']], '{"PHP", "HA", "HO"}', '3'],
+            'column vector #1' => [[['PHPPHPPHP'], ['HAHAHA'], ['HOHOHO']], '{"PHP"; "HA"; "HO"}', '3'],
+            'matrix #1' => [[['PHPPHP', '❤️🐘💚❤️🐘💚'], ['HAHA', 'HOHO']], '{"PHP", "❤️🐘💚"; "HA", "HO"}', '2'],
+            'row vector #2' => [[[' PHP  PHP  PHP ', ' PHP  PHP ']], '" PHP "', '{3, 2}'],
+        ];
     }
 }

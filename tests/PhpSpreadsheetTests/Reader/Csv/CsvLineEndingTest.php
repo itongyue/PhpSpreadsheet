@@ -36,7 +36,32 @@ class CsvLineEndingTest extends TestCase
         $spreadsheet->disconnectWorksheets();
     }
 
-    public function providerEndings(): array
+    /**
+     * @dataProvider providerEndings
+     */
+    public function testEndingsNoDetect(string $ending): void
+    {
+        $this->tempFile = $filename = File::temporaryFilename();
+        $data = ['123', '456', '789'];
+        file_put_contents($filename, implode($ending, $data));
+        $reader = new Csv();
+        $reader->setTestAutoDetect(false);
+        $spreadsheet = $reader->load($filename);
+        $sheet = $spreadsheet->getActiveSheet();
+        if ($ending === "\r") {
+            // Can't handle Mac line endings without autoDetect
+            self::assertEquals(implode("\n", $data), $sheet->getCell('A1')->getValue());
+            self::assertNull($sheet->getCell('A2')->getValue());
+            self::assertNull($sheet->getCell('A3')->getValue());
+        } else {
+            self::assertEquals($data[0], $sheet->getCell('A1')->getValue());
+            self::assertEquals($data[1], $sheet->getCell('A2')->getValue());
+            self::assertEquals($data[2], $sheet->getCell('A3')->getValue());
+        }
+        $spreadsheet->disconnectWorksheets();
+    }
+
+    public static function providerEndings(): array
     {
         return [
             'Unix endings' => ["\n"],

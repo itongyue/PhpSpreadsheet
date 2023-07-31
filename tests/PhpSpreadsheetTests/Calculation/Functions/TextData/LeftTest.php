@@ -2,6 +2,7 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Settings;
 
@@ -32,7 +33,7 @@ class LeftTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerLEFT(): array
+    public static function providerLEFT(): array
     {
         return require 'tests/data/Calculation/TextData/LEFT.php';
     }
@@ -60,7 +61,7 @@ class LeftTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerLocaleLEFT(): array
+    public static function providerLocaleLEFT(): array
     {
         return [
             ['VR', 'fr_FR', true, 2],
@@ -89,7 +90,7 @@ class LeftTest extends AllSetupTeardown
         self::assertEquals($resultB2, $sheet->getCell('B2')->getCalculatedValue());
     }
 
-    public function providerCalculationTypeLEFTTrue(): array
+    public static function providerCalculationTypeLEFTTrue(): array
     {
         return [
             'Excel LEFT(true, 1) AND LEFT("hello", true)' => [
@@ -125,7 +126,7 @@ class LeftTest extends AllSetupTeardown
         self::assertEquals($resultB2, $sheet->getCell('B2')->getCalculatedValue());
     }
 
-    public function providerCalculationTypeLEFTFalse(): array
+    public static function providerCalculationTypeLEFTFalse(): array
     {
         return [
             'Excel LEFT(false, 1) AND LEFT("hello", false)' => [
@@ -160,7 +161,7 @@ class LeftTest extends AllSetupTeardown
         self::assertEquals($resultB2, $sheet->getCell('B2')->getCalculatedValue());
     }
 
-    public function providerCalculationTypeLEFTNull(): array
+    public static function providerCalculationTypeLEFTNull(): array
     {
         return [
             'Excel LEFT(null, 1) AND LEFT("hello", null)' => [
@@ -178,6 +179,28 @@ class LeftTest extends AllSetupTeardown
                 '',
                 '',
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLeftArray
+     */
+    public function testLeftArray(array $expectedResult, string $argument1, string $argument2): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=LEFT({$argument1}, {$argument2})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerLeftArray(): array
+    {
+        return [
+            'row vector #1' => [[['Hel', 'Wor', 'Php']], '{"Hello", "World", "PhpSpreadsheet"}', '3'],
+            'column vector #1' => [[['Hel'], ['Wor'], ['Php']], '{"Hello"; "World"; "PhpSpreadsheet"}', '3'],
+            'matrix #1' => [[['Hel', 'Wor'], ['Php', 'Exc']], '{"Hello", "World"; "PhpSpreadsheet", "Excel"}', '3'],
+            'column vector #2' => [[['Php'], ['PhpSp']], '"PhpSpreadsheet"', '{3; 5}'],
         ];
     }
 }

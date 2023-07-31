@@ -2,8 +2,11 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Style;
 
+use PhpOffice\PhpSpreadsheet\Cell\CellAddress;
+use PhpOffice\PhpSpreadsheet\Cell\CellRange;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PHPUnit\Framework\TestCase;
 
 class StyleTest extends TestCase
@@ -53,6 +56,29 @@ class StyleTest extends TestCase
         self::assertTrue($sheet->getStyle('A1')->getFont()->getItalic());
         self::assertTrue($sheet->getStyle('B2')->getFont()->getItalic());
         self::assertFalse($sheet->getStyle('C3')->getFont()->getItalic());
+    }
+
+    public function testStyleIsReused(): void
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $styleArray = [
+            'font' => [
+                'italic' => true,
+            ],
+        ];
+
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->getStyle('A3')->getFont()->setBold(true);
+        $sheet->getStyle('A3')->getFont()->setItalic(true);
+
+        $sheet->getStyle('A')->applyFromArray($styleArray);
+
+        self::assertCount(4, $spreadsheet->getCellXfCollection());
+        $spreadsheet->garbageCollect();
+
+        self::assertCount(3, $spreadsheet->getCellXfCollection());
     }
 
     public function testStyleRow(): void
@@ -156,5 +182,29 @@ class StyleTest extends TestCase
         self::assertFalse($sheet->getStyle('A1')->getFont()->getBold());
         self::assertFalse($sheet->getStyle('B2')->getFont()->getBold());
         self::assertTrue($sheet->getStyle('C3')->getFont()->getBold());
+    }
+
+    public function testStyleCellAddressObject(): void
+    {
+        $spreadsheet = new Spreadsheet();
+        $worksheet = $spreadsheet->getActiveSheet();
+        $cellAddress = new CellAddress('A1', $worksheet);
+        $style = $worksheet->getStyle($cellAddress);
+        $style->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_YYYYMMDDSLASH);
+
+        self::assertSame(NumberFormat::FORMAT_DATE_YYYYMMDDSLASH, $style->getNumberFormat()->getFormatCode());
+    }
+
+    public function testStyleCellRangeObject(): void
+    {
+        $spreadsheet = new Spreadsheet();
+        $worksheet = $spreadsheet->getActiveSheet();
+        $cellAddress1 = new CellAddress('A1', $worksheet);
+        $cellAddress2 = new CellAddress('B2', $worksheet);
+        $cellRange = new CellRange($cellAddress1, $cellAddress2);
+        $style = $worksheet->getStyle($cellRange);
+        $style->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_YYYYMMDDSLASH);
+
+        self::assertSame(NumberFormat::FORMAT_DATE_YYYYMMDDSLASH, $style->getNumberFormat()->getFormatCode());
     }
 }

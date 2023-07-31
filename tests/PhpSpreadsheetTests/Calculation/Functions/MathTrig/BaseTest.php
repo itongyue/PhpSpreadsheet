@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class BaseTest extends AllSetupTeardown
 {
     /**
@@ -38,8 +40,27 @@ class BaseTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerBASE(): array
+    public static function providerBASE(): array
     {
         return require 'tests/data/Calculation/MathTrig/BASE.php';
+    }
+
+    /**
+     * @dataProvider providerBaseArray
+     */
+    public function testBaseArray(array $expectedResult, string $argument1, string $argument2): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=BASE({$argument1}, {$argument2})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerBaseArray(): array
+    {
+        return [
+            'matrix' => [[['1111111', '177'], ['127', '7F']], '127', '{2, 8; 10, 16}'],
+        ];
     }
 }

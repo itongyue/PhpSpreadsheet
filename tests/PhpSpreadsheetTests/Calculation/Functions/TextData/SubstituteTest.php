@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class SubstituteTest extends AllSetupTeardown
 {
     /**
@@ -42,8 +44,27 @@ class SubstituteTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerSUBSTITUTE(): array
+    public static function providerSUBSTITUTE(): array
     {
         return require 'tests/data/Calculation/TextData/SUBSTITUTE.php';
+    }
+
+    /**
+     * @dataProvider providerSubstituteArray
+     */
+    public function testSubstituteArray(array $expectedResult, string $oldText, string $fromText, string $toText): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=SUBSTITUTE({$oldText}, {$fromText}, {$toText})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerSubstituteArray(): array
+    {
+        return [
+            'row vector' => [[['ElePHPant', 'EleFFant']], '"Elephant"', '"ph"', '{"PHP", "FF"}'],
+        ];
     }
 }

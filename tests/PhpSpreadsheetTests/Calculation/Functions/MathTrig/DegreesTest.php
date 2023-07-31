@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class DegreesTest extends AllSetupTeardown
 {
     /**
@@ -24,8 +26,29 @@ class DegreesTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-8);
     }
 
-    public function providerDegrees(): array
+    public static function providerDegrees(): array
     {
         return require 'tests/data/Calculation/MathTrig/DEGREES.php';
+    }
+
+    /**
+     * @dataProvider providerDegreesArray
+     */
+    public function testDegreesArray(array $expectedResult, string $array): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=DEGREES({$array})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-12);
+    }
+
+    public static function providerDegreesArray(): array
+    {
+        return [
+            'row vector' => [[[143.23944878270600, 7.16197243913529, -183.34649444186300]], '{2.5, 0.125, -3.2}'],
+            'column vector' => [[[143.23944878270600], [7.16197243913529], [-183.34649444186300]], '{2.5; 0.125; -3.2}'],
+            'matrix' => [[[143.23944878270600, 7.16197243913529], [429.71834634811700, -183.34649444186300]], '{2.5, 0.125; 7.5, -3.2}'],
+        ];
     }
 }

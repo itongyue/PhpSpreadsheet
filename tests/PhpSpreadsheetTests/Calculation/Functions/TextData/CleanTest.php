@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class CleanTest extends AllSetupTeardown
 {
     /**
@@ -24,8 +26,29 @@ class CleanTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerCLEAN(): array
+    public static function providerCLEAN(): array
     {
         return require 'tests/data/Calculation/TextData/CLEAN.php';
+    }
+
+    /**
+     * @dataProvider providerCleanArray
+     */
+    public function testCleanArray(array $expectedResult, string $array): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=CLEAN({$array})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerCleanArray(): array
+    {
+        return [
+            'row vector' => [[['PHP', 'MS Excel', 'Open/Libre Office']], '{"PHP", "MS Excel", "Open/Libre Office"}'],
+            'column vector' => [[['PHP'], ['MS Excel'], ['Open/Libre Office']], '{"PHP"; "MS Excel"; "Open/Libre Office"}'],
+            'matrix' => [[['PHP', 'MS Excel'], ['PhpSpreadsheet', 'Open/Libre Office']], '{"PHP", "MS Excel"; "PhpSpreadsheet", "Open/Libre Office"}'],
+        ];
     }
 }

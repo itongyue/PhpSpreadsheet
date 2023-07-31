@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+
 class ModTest extends AllSetupTeardown
 {
     /**
@@ -32,8 +34,27 @@ class ModTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerMOD(): array
+    public static function providerMOD(): array
     {
         return require 'tests/data/Calculation/MathTrig/MOD.php';
+    }
+
+    /**
+     * @dataProvider providerModArray
+     */
+    public function testModArray(array $expectedResult, string $argument1, string $argument2): void
+    {
+        $calculation = Calculation::getInstance();
+
+        $formula = "=MOD({$argument1}, {$argument2})";
+        $result = $calculation->_calculateFormulaValue($formula);
+        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+    }
+
+    public static function providerModArray(): array
+    {
+        return [
+            'matrix' => [[[4, 3, 2], [1, 0, 4], [3, 2, 1]], '{9, 8, 7; 6, 5, 4; 3, 2, 1}', '5'],
+        ];
     }
 }
